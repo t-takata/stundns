@@ -116,7 +116,7 @@ $ dig @192.168.1.24 -p 5300 +norec +short fuga.internal. txt
 
 ## Licence
 
-[MIT](https://github.com/t-takata/stundns/blob/master/LICENCE)
+[MIT](https://github.com/t-takata/stundns/blob/master/LICENSE)
 
 ## Author
 
