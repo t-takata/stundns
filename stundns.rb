@@ -12,14 +12,14 @@ module STUNDNS
   class STUNDNS
 
     def main
-			@query_ip_report = ["stundns.internal"]
-			@query_ip_port_report = ["stundns.internal"]
+      @query_ip_report = ["stundns.internal"]
+      @query_ip_port_report = ["stundns.internal"]
       @interfaces = [
         [:udp, "0.0.0.0", 5300],
         [:tcp, "0.0.0.0", 5300],
       ]
       parse_options!
-			listen_server
+      listen_server
     end
 
     def parse_options!
@@ -40,7 +40,6 @@ module STUNDNS
     end
 
     def parse_record_option(records, default_records = [])
-      # default result
       result = default_records
 
       if records.length > 0
@@ -92,7 +91,7 @@ module STUNDNS
     end
 
     def respond_your_ip(server, transaction)
-			begin
+      begin
         ip_str = transaction.options[:peer]
         ip = IPAddr.new(ip_str)
         if ip.ipv4?
@@ -104,21 +103,21 @@ module STUNDNS
         else
           transaction.fail!(:ServFail)
         end
-			rescue => error
+      rescue => error
         server.logger.log(Logger::ERROR, error.to_s)
         transaction.fail!(:ServFail)
-			end
+      end
     end
 
     def respond_your_ip_port(server, transaction)
-			begin
+      begin
         ip_address = transaction.options[:peer]
         port = transaction.options[:port]
-				txt_response = "%s %d" % [ip_address, port]
+        txt_response = "%s %d" % [ip_address, port]
         transaction.respond!(txt_response, {:ttl => 0})
-			rescue => error
+      rescue => error
         transaction.fail!(:ServFail)
-			end
+      end
     end
 
     def listen_server
@@ -129,17 +128,17 @@ module STUNDNS
       stundns = self
 
       RubyDNS::run_server({:listen =>@interfaces}) do
-				query_ip_report.each do |q|
-        	match(q, [IN::A, IN::AAAA]) do |transaction|
+        query_ip_report.each do |q|
+          match(q, [IN::A, IN::AAAA]) do |transaction|
             stundns.respond_your_ip(self, transaction)
-        	end
-				end
+          end
+        end
 
-				query_ip_port_report.each do |q|
-        	match(q, IN::TXT) do |transaction|
-						stundns.respond_your_ip_port(self, transaction)
-        	end
-				end
+        query_ip_port_report.each do |q|
+          match(q, IN::TXT) do |transaction|
+            stundns.respond_your_ip_port(self, transaction)
+          end
+        end
       
         otherwise do |transaction|
           transaction.fail!(:NXDomain)
